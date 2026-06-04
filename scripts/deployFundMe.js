@@ -1,6 +1,31 @@
 
 const {ether} = require("hardhat")
 
+async function verifyOnSepolia(contract, constructorArgs = []) {
+    if (hre.network.name !== "sepolia") {
+        console.log(`Skipping verification on network ${hre.network.name}`)
+        return
+    }
+
+    if (!process.env.ETHERSCAN_API_KEY && !process.env.ETHERSCAN_APIKEY) {
+        throw new Error("ETHERSCAN_API_KEY is required for sepolia verification")
+    }
+
+    // 等待5个确认，确保 Etherscan 已同步合约字节码
+    console.log("Waiting for 5 confirmations before verification...")
+    const deploymentTx = contract.deploymentTransaction()
+    if (deploymentTx) {
+        await deploymentTx.wait(5)
+        console.log("5 confirmations received, proceeding with verification...")
+    }
+
+    // 增加hre.run verify插件，自动在etherscan上验证合约
+    await hre.run("verify:verify", {
+        address: contract.target,
+        constructorArguments: constructorArgs
+    })
+}
+
 async function main() {
     // create factory and deploy contract
     const FundMeFactory = await ethers.getContractFactory("FundMe")
@@ -11,24 +36,7 @@ async function main() {
     await fundMe.waitForDeployment()
     console.log("FundMe deployed to:", fundMe.target)
 
-    if (hre.network.name === "sepolia") {
-        // 等待5个确认，确保 Etherscan 已同步合约字节码
-        console.log("Waiting for 5 confirmations before verification...")
-        const deploymentTx = fundMe.deploymentTransaction()
-        if (deploymentTx) {
-            await deploymentTx.wait(5)
-            console.log("5 confirmations received, proceeding with verification...")
-        }
-
-        // 增加hre.run verify插件，自动在etherscan上验证合约
-        // npx hardhat verify --network sepolia "0xDC45ab75292022E9775C922cF73A546fAe608A7B" "10"
-        await hre.run("verify:verify", {
-            address: fundMe.target,
-            constructorArguments: [10]
-        })
-    } else {
-        console.log(`Skipping verification on network ${hre.network.name}`)
-    }
+    await verifyOnSepolia(fundMe, [10])
 
     // 调用合约的fund函数，发送1个eth
     // const tx = await fundMe.fund({value: ether("1")})
