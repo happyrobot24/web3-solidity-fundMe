@@ -87,6 +87,7 @@ hardhat.local.config.js
 hardhat.local.config.ts
 node_modules
 .env
+.env.enc
 
 # Hardhat files
 /cache
