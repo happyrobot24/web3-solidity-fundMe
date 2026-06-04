@@ -19,6 +19,7 @@
   },
   "homepage": "https://github.com/happyrobot24/web3#readme",
   "devDependencies": {
+    "@chainlink/contracts": "^1.5.0",
     "@nomicfoundation/hardhat-toolbox": "^5.0.0",
     "hardhat": "^2.22.2"
   }
