@@ -13,6 +13,7 @@ coverage.json
 
 # 环境变量
 .env
+.env.enc
 .env.local
 .env.*.local
 
