@@ -1,15 +1,87 @@
-# Remix compiler artifacts
-**/artifacts/
-**/artifacts/**
+# 依赖
+node_modules/
+.pnp/
+.pnp.js
 
-# Remix plugin state folders
-deps/
-states/
+# 编译输出
+artifacts/
+cache/
+typechain/
+typechain-types/
+coverage/
+coverage.json
 
-# Debug info
-*.dbg.json
-*.tsbuildinfo
-
-# Optional
+# 环境变量
 .env
 .env.local
+.env.*.local
+
+# Hardhat / 部署相关
+deployments/localhost/
+deployments/hardhat/
+deployments/*/artifacts/
+deployments/*/cache/
+
+# 日志
+logs/
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# 测试输出
+test-results/
+
+# 构建输出
+dist/
+build/
+out/
+
+# IDE / 编辑器
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+*.suo
+*.user
+*.userosscache
+*.sln.docstates
+
+# 覆盖率工具
+coverage/
+.coverage
+
+# 临时文件
+tmp/
+temp/
+
+# 私钥 / 助记词（重要！）
+privatekey.txt
+mnemonic.txt
+.secret/
+
+# 智能合约依赖（如果使用 git submodule）
+contracts/**/node_modules/
+
+# Hardhat 生成的文件
+.solhint.json
+.solcover.js
+coverage.json
+
+# Ganache / 本地链数据
+ganache-data/
+
+# OpenZeppelin / 合约升级记录
+.openzeppelin/localhost/
+.openzeppelin/hardhat/
+.openzeppelin/unknown-*.json
+
+# 打包文件
+*.tgz
+*.tar.gz
+
+# 本地配置文件
+hardhat.local.config.js
+hardhat.local.config.ts
