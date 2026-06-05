@@ -1,0 +1,23 @@
+const getNamedAccounts = require("hardhat-deploy").getNamedAccounts
+
+// function deployFunction2 () {
+//     console.log("Hi!")
+// }
+// module.exports.default = deployFunction2
+
+module.exports = async ({getNamedAccounts, deployments}) => {
+    // 从getNamedAccounts 获取第一个账户的地址，命名为deployer
+    const firstAccount = (await getNamedAccounts()).firstAccount
+    console.log("Deploying MockV3Aggregator with the account:", firstAccount)
+    
+    // 从deployments对象中获取deploy函数
+    const { deploy } = deployments
+    // 调用deploy函数部署合约，传入合约名称和部署参数
+    await deploy("MockV3Aggregator", {
+        from: firstAccount,
+        args: [8, 300000000000], // 构造函数参数，8表示usdt8位。3000表示价格3000美元
+        log: true
+    })
+}
+
+module.exports.tags = ["all", "mock"]
