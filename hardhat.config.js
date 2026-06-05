@@ -1,5 +1,6 @@
 require("@nomicfoundation/hardhat-toolbox");
 require("@chainlink/env-enc").config();
+require("./tasks")
 
 /** @type import('hardhat/config').HardhatUserConfig */
 module.exports = {
@@ -8,7 +9,7 @@ module.exports = {
   networks: {
     sepolia: {
       url: process.env.SEPOLIA_RPC_URL,
-      accounts: [process.env.SEPOLIA_PRIVATE_KEY, process.env.SEPOLIA_PRIVATE_KEY_1].filter(Boolean),
+      accounts: [process.env.SEPOLIA_PRIVATE_KEY, process.env.ETHERSCAN_API_KEY_1].filter(Boolean),
       chainId: 11155111
     }
   },
