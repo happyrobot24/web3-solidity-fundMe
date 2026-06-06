@@ -2,7 +2,7 @@ const { assert, expect } = require("chai")
 const { ethers, deployments, getNamedAccounts, network } = require("hardhat")
 const hre = require("hardhat")
 const helpers = require("@nomicfoundation/hardhat-network-helpers")
-const {devlopmentChains} = require("../../helper-hardhat-config")
+const { devlopmentChains } = require("../../helper-hardhat-config")
 
 !devlopmentChains.includes(network.name)
 ? describe.skip
@@ -26,8 +26,8 @@ const {devlopmentChains} = require("../../helper-hardhat-config")
         const deployerSigner = await hre.ethers.getSigner(firstAccount)
         fundMe = await hre.ethers.getContractAt("FundMe", fundMeDeployment.address, deployerSigner)
         // 获取第二个账户的 FundMe 合约实例。这样用这个调用的时候就表示第二个账户调用合约
-        // fundMeSecondAccount = await hre.ethers.getContract("FundMe", secondAccount)
-        fundMeSecondAccount = await hre.ethers.getContract("FundMe", secondAccount)
+        const secondAccountSigner = await hre.ethers.getSigner(secondAccount)
+        fundMeSecondAccount = await hre.ethers.getContractAt("FundMe", fundMeDeployment.address, secondAccountSigner)
         mockV3Aggregator = await deployments.get("MockV3Aggregator")
 
     })
@@ -43,10 +43,10 @@ const {devlopmentChains} = require("../../helper-hardhat-config")
         // 获取部署合约的地址
         const deployerAddress = await fundMe.owner()
         console.log("Deployer address:", deployerAddress)
-        console.log("Deployer account:", deployer)
+        console.log("Deployer account:", firstAccount)
 
         // 断言部署者地址和msg.sender地址相同
-        assert.equal(deployerAddress, deployer, "Owner should be the deployer")
+        assert.equal(deployerAddress, firstAccount, "Owner should be the deployer")
     })
 
     it("test priceFeed is correctly initialized", async function () {
@@ -74,7 +74,7 @@ const {devlopmentChains} = require("../../helper-hardhat-config")
 
     it("window open, value is less than minimum, fund failed", 
         async function() {
-            await expect(fundMe.fund({value: ethers.parseEther("0.01")}))
+            await expect(fundMe.fund({value: ethers.parseEther("0.001")}))
                 .to.be.revertedWith("Send more ETH")
         }
     )
@@ -82,9 +82,9 @@ const {devlopmentChains} = require("../../helper-hardhat-config")
     it("Window open, value is greater minimum, fund success", 
         async function() {
             // greater than minimum
-            await fundMe.fund({value: ethers.parseEther("0.1")})
-            const balance = await fundMe.fundersToAmount(firstAccount)
-            await expect(balance).to.equal(ethers.parseEther("0.1"))
+            await fundMe.fund({value: ethers.parseEther("0.01")})
+            const balance = await fundMe.funderToAmount(firstAccount)
+            await expect(balance).to.equal(ethers.parseEther("0.01"))
         }
     )    
 
@@ -93,7 +93,7 @@ const {devlopmentChains} = require("../../helper-hardhat-config")
     it("not onwer, window closed, target reached, getFund failed", 
         async function() {
             // make sure the target is reached 
-            await fundMe.fund({value: ethers.parseEther("1")})
+            await fundMe.fund({value: ethers.parseEther("0.1")})
 
             // make sure the window is closed
             await helpers.time.increase(200)
@@ -106,15 +106,15 @@ const {devlopmentChains} = require("../../helper-hardhat-config")
 
     it("window open, target reached, getFund failed", 
         async function() {
-            await fundMe.fund({value: ethers.parseEther("1")})
+            await fundMe.fund({value: ethers.parseEther("0.1")})
             await expect(fundMe.getFund())
-                .to.be.revertedWith("window is not closed")
+                .to.be.revertedWith("window is closed")
         }
     )
 
     it("window closed, target not reached, getFund failed",
         async function() {
-            await fundMe.fund({value: ethers.parseEther("0.1")})
+            await fundMe.fund({value: ethers.parseEther("0.01")})
             // make sure the window is closed
             await helpers.time.increase(200)
             await helpers.mine()            
@@ -125,13 +125,13 @@ const {devlopmentChains} = require("../../helper-hardhat-config")
 
     it("window closed, target reached, getFund success", 
         async function() {
-            await fundMe.fund({value: ethers.parseEther("1")})
+            await fundMe.fund({value: ethers.parseEther("0.1")})
             // make sure the window is closed
             await helpers.time.increase(200)
             await helpers.mine()   
             await expect(fundMe.getFund())
                 .to.emit(fundMe, "FundWithdrawByOwner")
-                .withArgs(ethers.parseEther("1"))
+                .withArgs(ethers.parseEther("0.1"))
         }
     )
 
@@ -139,15 +139,15 @@ const {devlopmentChains} = require("../../helper-hardhat-config")
     // windowClosed, target not reached, funder has balance
     it("window open, target not reached, funder has balance", 
         async function() {
-            await fundMe.fund({value: ethers.parseEther("0.1")})
+            await fundMe.fund({value: ethers.parseEther("0.01")})
             await expect(fundMe.refund())
-                .to.be.revertedWith("window is not closed");
+                .to.be.revertedWith("window is closed");
         }
     )
 
     it("window closed, target reach, funder has balance", 
         async function() {
-            await fundMe.fund({value: ethers.parseEther("1")})
+            await fundMe.fund({value: ethers.parseEther("0.1")})
             // make sure the window is closed
             await helpers.time.increase(200)
             await helpers.mine()  
@@ -158,7 +158,7 @@ const {devlopmentChains} = require("../../helper-hardhat-config")
 
     it("window closed, target not reach, funder does not has balance", 
         async function() {
-            await fundMe.fund({value: ethers.parseEther("0.1")})
+            await fundMe.fund({value: ethers.parseEther("0.01")})
             // make sure the window is closed
             await helpers.time.increase(200)
             await helpers.mine()  
@@ -169,13 +169,13 @@ const {devlopmentChains} = require("../../helper-hardhat-config")
 
     it("window closed, target not reached, funder has balance", 
         async function() {
-            await fundMe.fund({value: ethers.parseEther("0.1")})
+            await fundMe.fund({value: ethers.parseEther("0.01")})
             // make sure the window is closed
             await helpers.time.increase(200)
             await helpers.mine()  
             await expect(fundMe.refund())
                 .to.emit(fundMe, "RefundByFunder")
-                .withArgs(firstAccount, ethers.parseEther("0.1"))
+                .withArgs(firstAccount, ethers.parseEther("0.01"))
         }
     )
 
