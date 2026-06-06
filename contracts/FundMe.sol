@@ -23,9 +23,9 @@ contract FundMe{
     uint lockTime;
 
     // 构造函数，部署合约时指定
-    constructor (uint _lockTime) {
+    constructor (uint _lockTime, address priceFeedAddr) {
         // sepolia testnet
-        priceFeed = AggregatorV3Interface(0x694AA1769357215DE4FAC081bf1f309aDC325306);
+        priceFeed = AggregatorV3Interface(priceFeedAddr);
         owner = msg.sender;
         deployTime = block.timestamp;
         lockTime = _lockTime;
