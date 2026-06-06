@@ -124,7 +124,7 @@ contract FundMe {
         address myAddress = msg.sender;
         uint contractBalance = address(this).balance;
         // 目标达成了，不能退款
-        require(contractBalance >= TARGET_AMOUNT, "Target is reached");
+        require(convertEth2USD(contractBalance) < TARGET_AMOUNT, "Target is reached");
         uint myContractAmount = funderToAmount[myAddress];
         require(myContractAmount > 0, "you have no balance in this contract!");
 
