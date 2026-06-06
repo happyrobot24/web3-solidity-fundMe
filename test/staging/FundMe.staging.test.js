@@ -19,7 +19,7 @@ devlopmentChains.includes(network.name)
     it("fund and getFund successfully", 
         async function() {
             // make sure target reached
-            await fundMe.fund({value: ethers.parseEther("0.05")}) // 3000 * 0.05 = 150
+            await fundMe.fund({value: ethers.parseEther("0.1")}) // 0.1 ETH should be safely above 100 USD on Sepolia
             // make sure window closed
             await new Promise(resolve => setTimeout(resolve, 181 * 1000))
             // make sure we can get receipt 
@@ -27,7 +27,7 @@ devlopmentChains.includes(network.name)
             const getFundReceipt = await getFundTx.wait()
             expect(getFundReceipt)
                 .to.be.emit(fundMe, "FundWithdrawByOwner")
-                .withArgs(ethers.parseEther("0.05"))
+                .withArgs(ethers.parseEther("0.1"))
         }
     )
     // test fund and refund successfully
