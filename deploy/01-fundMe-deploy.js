@@ -50,9 +50,6 @@ module.exports = async ({getNamedAccounts, deployments}) => {
     } else {
         console.log("Skipping verification on network", network.name)
     }
-
-
-
     
 }
 
