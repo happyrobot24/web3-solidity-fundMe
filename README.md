@@ -1,6 +1,13 @@
 # 部署指令和交互指令
+- 用run脚本文件部署
+npx hardhat run scripts/deployFundMe.js
+
+- 用task任务的形式进行部署
 npx hardhat deploy-fundMe
 npx hardhat interact-fundMe --contract 0x3eEED288c1052aA16adedbfb9E0EC49BD478809F
+
+- 用test框架部署
+npx hardhat test --network sepolia
 
 # 链上成果
 
