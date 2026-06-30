@@ -1,4 +1,7 @@
 # 部署指令和交互指令
+- npx env-enc set
+Yong5020
+
 - 用run脚本文件部署
 npx hardhat run scripts/deployFundMe.js
 
